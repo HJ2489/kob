@@ -7,9 +7,14 @@ export default {
         photo: "",
         token: "",
         is_login: false,
+        pulling_info: true,  // 是否正在从云端拉取信息
     },
     getters: {
     },
+    /*
+    mutations: 存的是同步操作，调用用commit
+    actions: 存的是异步操作，调用用dispatch，比如从云端拉取数据，再进行修改是异步（没有对云端的数据进行修改）
+    */
     mutations: {
         updateUser(state, user) {
             state.id = user.id;
@@ -26,6 +31,9 @@ export default {
             state.photo = "";
             state.token = "";
             state.is_login = false;
+        },
+        updatePullingInfo(state, pulling_info) {
+            state.pulling_info = pulling_info;
         }
     },
     actions: {
@@ -39,6 +47,7 @@ export default {
                 },
                 success(resp) {
                     if (resp.error_message === "success") {
+                        localStorage.setItem("jwt_token", resp.token);
                         context.commit("updateToken", resp.token);
                         data.success(resp);
                     } else {
@@ -74,6 +83,7 @@ export default {
             });
         },
         logout(context) {
+            localStorage.removeItem("jwt_token");
             context.commit("logout");
         }
     },
